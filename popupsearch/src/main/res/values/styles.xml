@@ -1,0 +1,30 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Animations" />
+
+    <!-- PopDownMenu -->
+    <style name="Animations.PopupMenu" />
+
+    <style name="Animations.PopupMenu.Left">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_left_to_right</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_right_to_left</item>
+    </style>
+
+    <style name="Animations.PopupMenu.Right">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_right_to_left</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_left_to_right</item>
+    </style>
+
+    <style name="Animations.PopupMenu.Center">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_center</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_center</item>
+    </style>
+
+
+
+</resources>

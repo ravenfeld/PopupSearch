@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="fr.ravenfeld.librairies.popupsearch.ExampleActivity" >
+
+    <item android:id="@+id/button_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/search"
+        android:showAsAction="always"
+        android:actionLayout="@layout/bar_search"
+        />
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+</menu>

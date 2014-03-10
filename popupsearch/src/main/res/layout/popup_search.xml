@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+**
+** /res/layout/popup_searchh.xml
+**
+** Author: Lorensius W. L. T <lorenz@londatiga.net>
+**
+*/ 
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+       >
+
+
+    <ImageView
+        android:id="@+id/arrow_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/popup_search_arrow_up" />
+
+     <FrameLayout
+        android:id="@+id/header2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/popup_search_top_frame"
+         android:layout_below="@id/arrow_up"
+         />
+
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header2"
+        android:orientation="vertical"
+        android:background="@drawable/background_popup"
+        android:layout_marginTop="-2dp"
+        android:layout_marginBottom="-2dp"
+        >
+        <Button
+            android:id="@+id/button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_list"
+            />
+    <fr.ravenfeld.librairies.popupsearch.ListViewPopupSearch
+        android:id="@+id/scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:paddingLeft="1dip"
+       />
+
+
+
+
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/footer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/content"
+        android:background="@drawable/popup_search_bottom_frame" />
+
+</RelativeLayout>
