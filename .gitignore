@@ -9,3 +9,8 @@ gen
 bin
 target
 .idea
+.gradlew
+.gradlew.bat
+settings.gradle
+gradle
+*.iml
