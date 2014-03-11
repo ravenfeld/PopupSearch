@@ -36,12 +36,12 @@ public class ActionPopupSearch {
         ANIM_GROW_FROM_LEFT, ANIM_GROW_FROM_RIGHT, ANIM_GROW_FROM_CENTER, ANIM_AUTO
     }
 
-    protected Activity mActivity;
-    protected PopupWindow mWindow;
-    public View mRootView;
+    private Activity mActivity;
+    private PopupWindow mWindow;
+    private View mRootView;
     private ImageView mArrowUp;
     private View mViewActionSearch;
-    protected Drawable mBackground = null;
+    private Drawable mBackground = null;
     private AnimationPopupSearch mAnimStyle;
     private ListViewPopupSearch mListView;
 
@@ -141,6 +141,7 @@ public class ActionPopupSearch {
         setAnimationStyle(screenWidth, anchorRect.centerX());
         mWindow.showAtLocation(mViewActionSearch, Gravity.NO_GRAVITY, xPos, yPos);
         mListView.setYPos(yPos);
+
 
     }
 

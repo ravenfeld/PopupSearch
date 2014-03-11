@@ -100,7 +100,8 @@ public class ExampleActivity extends Activity {
                 if (mSearchView != null) {
                     mSearchViewClose.setVisibility(View.INVISIBLE);
                     mSearchView.getText().clear();
-                    mList = getList();
+                    mList.clear();
+                    mList.addAll(getList());
                 }
 
             }
@@ -116,7 +117,7 @@ public class ExampleActivity extends Activity {
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mList);
         mActionPopupSearch.setAdapter(mAdapter);
 
-        Button button = (Button) mActionPopupSearch.mRootView.findViewById(R.id.button);
+        Button button = (Button) mActionPopupSearch.getView().findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +150,7 @@ public class ExampleActivity extends Activity {
             if (newApi != null) {
                 mList.add(0, newApi);
                 mAdapter.notifyDataSetChanged();
+                mActionPopupSearch.getView().invalidate();
             }
         }
     }
