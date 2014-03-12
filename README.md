@@ -10,7 +10,7 @@
     
 ## Licence
     
-Copyright 2012-2013 - Alexis Lecanu ([alexis Lecanu@gmail.com](mailto:alexis.lecanu@gmail.com))
+Copyright 2014- Alexis Lecanu ([alexis Lecanu@gmail.com](mailto:alexis.lecanu@gmail.com))
     
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
