@@ -10,20 +10,16 @@
 
 package fr.ravenfeld.librairies.popupsearch.example;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import fr.ravenfeld.librairies.popupsearch.R;
 
-/**
- * Created by alecanu on 12/03/2014.
- */
+
 public class ExampleFragmentActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
