@@ -1,22 +1,26 @@
 /*
  * Copyright 2014. Ravenfeld
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- *  the License. You may obtain a copy of the License at
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under th License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software distributed under th License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-package fr.ravenfeld.librairies.popupsearch;
+package fr.ravenfeld.librairies.popupsearch.example;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,13 +28,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExampleActivity extends Activity {
+import fr.ravenfeld.librairies.popupsearch.ActionPopupSearch;
+import fr.ravenfeld.librairies.popupsearch.R;
 
+
+public class HomeFragment extends Fragment {
+
+    private static final String TAG = "PopSearchExample";
     private RelativeLayout mSearchViewLayout;
     private EditText mSearchView;
     private ImageView mSearchViewClose;
@@ -38,16 +46,25 @@ public class ExampleActivity extends Activity {
     private List<String> mList;
     private ArrayAdapter<String> mAdapter;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mList = getList();
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (!(getActivity() instanceof ExampleFragmentActivity)) {
+            throw new RuntimeException();
+        }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        mList = getList(1);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main, menu);
         MenuItem searchItem = menu.findItem(R.id.button_search);
         mSearchViewLayout = (RelativeLayout) searchItem.getActionView();
         mSearchViewClose = (ImageView) mSearchViewLayout.findViewById(R.id.close);
@@ -60,14 +77,14 @@ public class ExampleActivity extends Activity {
         mSearchView = (EditText) mSearchViewLayout.findViewById(R.id.search);
 
         mSearchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mActionPopupSearch.isShowing()) {
-                    mActionPopupSearch.show();
-                    mSearchViewClose.setVisibility(View.VISIBLE);
-                }
-            }
-        }
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (!mActionPopupSearch.isShowing()) {
+                                                   mActionPopupSearch.show();
+                                                   mSearchViewClose.setVisibility(View.VISIBLE);
+                                               }
+                                           }
+                                       }
         );
         mSearchView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -79,21 +96,12 @@ public class ExampleActivity extends Activity {
         });
 
         initPopupSearch();
-
-        return true;
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void initPopupSearch() {
-        mActionPopupSearch = new ActionPopupSearch(this, mSearchView);
+        mActionPopupSearch = new ActionPopupSearch(getActivity(), mSearchView);
         mActionPopupSearch.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -101,7 +109,7 @@ public class ExampleActivity extends Activity {
                     mSearchViewClose.setVisibility(View.INVISIBLE);
                     mSearchView.getText().clear();
                     mList.clear();
-                    mList.addAll(getList());
+                    mList.addAll(getList(1));
                 }
 
             }
@@ -110,11 +118,16 @@ public class ExampleActivity extends Activity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplication(), "Position: " + position, Toast.LENGTH_SHORT).show();
+                mActionPopupSearch.dismiss();
+                mActionPopupSearch.hideKeyboard();
+                ExampleFragmentActivity fca = (ExampleFragmentActivity) getActivity();
+                fca.switchFragmentAnimationRightLeft(mList.get(position));
+
+
             }
         });
 
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mList);
+        mAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, mList);
         mActionPopupSearch.setAdapter(mAdapter);
 
         Button button = (Button) mActionPopupSearch.getView().findViewById(R.id.button);
@@ -127,35 +140,49 @@ public class ExampleActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.e("TEST", "onCreateView home");
+
+        View rootView = inflater.inflate(R.layout.fragment_home, null);
+
+        return rootView;
+
+    }
+
+
+    @Override
+    public void onDestroy() {
         super.onDestroy();
         mActionPopupSearch.dismiss();
     }
 
-    private class DataRetriever extends AsyncTask<Void, Void, String> {
+    private class DataRetriever extends AsyncTask<Void, Void, Boolean> {
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
             try {
                 Thread.sleep(1000);
+                return false;
             } catch (InterruptedException e) {
-                Log.e("TEST", "Something went wrong with making the thread sleep...");
+                Log.e(TAG, "Something went wrong with making the thread sleep...");
+                return true;
             }
 
-            return "New - Alexis Lecanu";
         }
 
         @Override
-        protected void onPostExecute(String newApi) {
-            if (newApi != null) {
-                mList.add(0, newApi);
+        protected void onPostExecute(Boolean error) {
+            if (!error) {
+                int index = mList.size();
+                mList.clear();
+                mList.addAll(getList(index + 1));
                 mAdapter.notifyDataSetChanged();
                 mActionPopupSearch.getView().invalidate();
             }
         }
     }
 
-    private List<String> getList() {
+    private List<String> getList(int nbElements) {
         List<String> list = new ArrayList<String>();
         list.add("Arryn");
         list.add("Baratheon");
@@ -166,6 +193,13 @@ public class ExampleActivity extends Activity {
         list.add("Targaryen");
         list.add("Tully");
         list.add("Tyrell");
-        return list;
+        list.add("Sorry there don't exist other families");
+        if (nbElements > list.size()) {
+            return list;
+        } else {
+            return list.subList(0, nbElements);
+        }
     }
+
+
 }

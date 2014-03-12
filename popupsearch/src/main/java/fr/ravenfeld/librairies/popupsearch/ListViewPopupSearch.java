@@ -1,11 +1,11 @@
 /*
  * Copyright 2014. Ravenfeld
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- *  the License. You may obtain a copy of the License at
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under th License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software distributed under th License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
 package fr.ravenfeld.librairies.popupsearch;
@@ -20,7 +20,8 @@ import android.widget.ListView;
 public class ListViewPopupSearch extends ListView {
 
     private int mYPos;
-    private View mArrowUp;
+    private View mFooter;
+    private View mHeader;
     private int mMaxHeight;
     private boolean mMaxHeightEnable = false;
 
@@ -44,16 +45,18 @@ public class ListViewPopupSearch extends ListView {
 
         int heightDifference = proposedHeight - (r.height());
         int height;
+        int height_header = 0;
+        int height_footer = 0;
 
         if (heightDifference > -(r.top + mYPos)) {
-
-            View v = getChildAt(0);
-            Rect r2 = new Rect();
-
-            if (v != null) {
-                v.getDrawingRect(r2);
+            if (mHeader != null) {
+                height_header = mHeader.getHeight();
             }
-            height = r.height() - mYPos - r2.height() - mArrowUp.getHeight();
+            if (mFooter != null) {
+                height_footer = mFooter.getHeight();
+            }
+            height = r.height() - mYPos - height_header - height_footer;
+
             if (mMaxHeightEnable && height > mMaxHeight) {
                 height = mMaxHeight;
             }
@@ -68,8 +71,12 @@ public class ListViewPopupSearch extends ListView {
         mYPos = pos;
     }
 
-    public void setArrowUp(View v) {
-        mArrowUp = v;
+    public void setFooter(View v) {
+        mFooter = v;
+    }
+
+    public void setHeader(View v) {
+        mHeader = v;
     }
 
     public void setMaxHeight(int max) {

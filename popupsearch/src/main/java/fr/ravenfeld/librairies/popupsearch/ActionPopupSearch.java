@@ -1,20 +1,22 @@
 /*
  * Copyright 2014. Ravenfeld
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- *  the License. You may obtain a copy of the License at
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under th License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software distributed under th License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
 package fr.ravenfeld.librairies.popupsearch;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -44,6 +47,9 @@ public class ActionPopupSearch {
     private Drawable mBackground = null;
     private AnimationPopupSearch mAnimStyle;
     private ListViewPopupSearch mListView;
+    private View mActivityRootView;
+    private ViewTreeObserver.OnGlobalLayoutListener mOnGlobalLayoutListener;
+    private boolean mOpenKeyboard;
 
     public ActionPopupSearch(Activity activity, View viewActionSearch) {
         mActivity = activity;
@@ -80,7 +86,10 @@ public class ActionPopupSearch {
         mRootView = inflater.inflate(id, null);
         mArrowUp = (ImageView) mRootView.findViewById(R.id.arrow_up);
         mListView = (ListViewPopupSearch) mRootView.findViewById(R.id.scroll);
-        mListView.setArrowUp(mArrowUp);
+        View footer = mRootView.findViewById(R.id.view_footer);
+        mListView.setFooter(footer);
+        View header = mRootView.findViewById(R.id.view_header);
+        mListView.setHeader(header);
         setContentView(mRootView);
     }
 
@@ -180,8 +189,6 @@ public class ActionPopupSearch {
 
         final int arrowWidth = mArrowUp.getMeasuredWidth();
 
-        mArrowUp.setVisibility(View.VISIBLE);
-
         ViewGroup.MarginLayoutParams param = (ViewGroup.MarginLayoutParams) mArrowUp.getLayoutParams();
 
         param.leftMargin = requestedX - arrowWidth / 2;
@@ -227,24 +234,38 @@ public class ActionPopupSearch {
     }
 
     public void setListenerToRootView() {
-        final View activityRootView = mActivity.getWindow().getDecorView().findViewById(android.R.id.content);
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        mActivityRootView = mActivity.getWindow().getDecorView().findViewById(android.R.id.content);
+        mOnGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
 
-                int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+                int heightDiff = mActivityRootView.getRootView().getHeight() - mActivityRootView.getHeight();
                 int contentViewTop = mActivity.getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
                 if (heightDiff > contentViewTop && !mWindow.isShowing()) {
                     show();
+                    mOpenKeyboard = true;
                 } else {
                     update();
+                    mOpenKeyboard = false;
                 }
             }
-        });
+        };
+        mActivityRootView.getViewTreeObserver().addOnGlobalLayoutListener(mOnGlobalLayoutListener);
     }
 
     public void dismiss() {
+        removeOnGlobalLayoutListener(mActivityRootView, mOnGlobalLayoutListener);
         mWindow.dismiss();
+    }
+
+    @SuppressLint("NewApi")
+    public static void removeOnGlobalLayoutListener(View v,
+                                                    ViewTreeObserver.OnGlobalLayoutListener listener) {
+        if (Build.VERSION.SDK_INT < 16) {
+            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+        } else {
+            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+        }
     }
 
     public void update() {
@@ -273,5 +294,13 @@ public class ActionPopupSearch {
 
     public void setAnimStyle(AnimationPopupSearch mAnimStyle) {
         this.mAnimStyle = mAnimStyle;
+    }
+
+    public void hideKeyboard() {
+        if (mOpenKeyboard) {
+            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        }
     }
 }
