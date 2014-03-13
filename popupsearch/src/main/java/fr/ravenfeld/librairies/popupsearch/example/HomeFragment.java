@@ -141,8 +141,6 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("TEST", "onCreateView home");
-
         View rootView = inflater.inflate(R.layout.fragment_home, null);
 
         return rootView;
@@ -153,7 +151,9 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mActionPopupSearch.dismiss();
+        if(mActionPopupSearch!=null) {
+            mActionPopupSearch.dismiss();
+        }
     }
 
     private class DataRetriever extends AsyncTask<Void, Void, Boolean> {
