@@ -10,17 +10,15 @@
 
 package fr.ravenfeld.librairies.popupsearch.example;
 
-import android.app.AlertDialog;
 import android.support.v4.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import fr.ravenfeld.librairies.popupsearch.R;
 
 
 public class ExampleFragmentActivity extends FragmentActivity {
+    private AdvancedFragment mCurrentFragment;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,51 +31,21 @@ public class ExampleFragmentActivity extends FragmentActivity {
 
     @Override
     public void onBackPressed() {
-        //getFragmentManager().getBackStackEntryCount();
-        Fragment ft = getSupportFragmentManager().findFragmentByTag("HOME");
-        if (ft != null && ft.isVisible()) {
-            showDialogExit();
-        } else {
-            switchFragmentAnimationLeftRight();
-        }
-        //switchFragmentAnimationLeftRight();
-
-        //showDialogExit();
-
-    }
-
-    public void showDialogExit() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                this);
-
-        alertDialogBuilder
-                .setMessage(R.string.exit_message)
-                .setCancelable(false)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        ExampleFragmentActivity.this.finish();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        mCurrentFragment.onBackPressed();
     }
 
     public void switchFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.activity_frame, new HomeFragment(), "HOME");
+        mCurrentFragment = new HomeFragment();
+        ft.replace(R.id.activity_frame, mCurrentFragment, "HOME");
         ft.commit();
     }
 
     public void switchFragmentAnimationRightLeft(String label) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-        ft.replace(R.id.activity_frame, new DetailFragment(label), "DETAIL");
+        mCurrentFragment = new DetailFragment(label);
+        ft.replace(R.id.activity_frame, mCurrentFragment, "DETAIL");
         ft.commit();
 
     }
@@ -85,6 +53,7 @@ public class ExampleFragmentActivity extends FragmentActivity {
     public void switchFragmentAnimationLeftRight() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        ft.replace(R.id.activity_frame, new HomeFragment(), "HOME").commit();
+        mCurrentFragment = new HomeFragment();
+        ft.replace(R.id.activity_frame, mCurrentFragment, "HOME").commit();
     }
 }

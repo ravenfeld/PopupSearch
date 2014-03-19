@@ -11,6 +11,8 @@
 package fr.ravenfeld.librairies.popupsearch.example;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,7 +38,7 @@ import fr.ravenfeld.librairies.popupsearch.ActionPopupSearch;
 import fr.ravenfeld.librairies.popupsearch.R;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends AdvancedFragment   {
 
     private static final String TAG = "PopSearchExample";
     private RelativeLayout mSearchViewLayout;
@@ -147,6 +149,36 @@ public class HomeFragment extends Fragment {
 
     }
 
+    public void onBackPressed() {
+        if(mActionPopupSearch!=null && mActionPopupSearch.isShowing()) {
+            mActionPopupSearch.dismiss();
+        }else {
+            showDialogExit();
+        }
+    }
+
+
+    public void showDialogExit() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                getActivity());
+
+        alertDialogBuilder
+                .setMessage(R.string.exit_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        getActivity().finish();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
     @Override
     public void onDestroy() {
