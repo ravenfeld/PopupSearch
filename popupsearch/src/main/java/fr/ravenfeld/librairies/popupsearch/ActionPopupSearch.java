@@ -10,14 +10,15 @@
 
 package fr.ravenfeld.librairies.popupsearch;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -106,6 +106,7 @@ public class ActionPopupSearch {
 
         if (mRootView == null)
             throw new IllegalStateException("setCntentView was not called with a view to display.");
+
 
         if (mBackground == null) {
             mWindow.setBackgroundDrawable(new BitmapDrawable());
@@ -202,7 +203,7 @@ public class ActionPopupSearch {
 
     private void onTouchOutSide(int[] location) {
         if (!isViewContains(mViewActionSearch, location) && !isViewContains(mRootView, location)) {
-            mWindow.dismiss();
+            dismiss();
         }
     }
 
@@ -229,47 +230,21 @@ public class ActionPopupSearch {
     public void setContentView(View root) {
         mRootView = root;
         mWindow.setContentView(root);
-        setListenerToRootView();
-
     }
 
-    public void setListenerToRootView() {
-        mActivityRootView = mActivity.getWindow().getDecorView().findViewById(android.R.id.content);
-        mOnGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-
-                int heightDiff = mActivityRootView.getRootView().getHeight() - mActivityRootView.getHeight();
-                int contentViewTop = mActivity.getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
-                if (heightDiff > contentViewTop && !mWindow.isShowing()) {
-                    show();
-                    mOpenKeyboard = true;
-                } else {
-                    update();
-                    mOpenKeyboard = false;
-                }
-            }
-        };
-        mActivityRootView.getViewTreeObserver().addOnGlobalLayoutListener(mOnGlobalLayoutListener);
-    }
 
     public void dismiss() {
-        removeOnGlobalLayoutListener(mActivityRootView, mOnGlobalLayoutListener);
+        hideKeyboard();
         mWindow.dismiss();
     }
 
-    @SuppressLint("NewApi")
-    public static void removeOnGlobalLayoutListener(View v,
-                                                    ViewTreeObserver.OnGlobalLayoutListener listener) {
-        if (Build.VERSION.SDK_INT < 16) {
-            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-        } else {
-            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
-        }
-    }
-
     public void update() {
-        mListView.invalidateViews();
+        mListView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mListView.invalidateViews();
+            }
+        },500);
     }
 
     public void setWidth(int width) {
@@ -297,10 +272,13 @@ public class ActionPopupSearch {
     }
 
     public void hideKeyboard() {
-        if (mOpenKeyboard) {
-            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        }
+        InputMethodManager in = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (in.isActive(mViewActionSearch))
+            in.hideSoftInputFromWindow(mViewActionSearch.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN, new ResultReceiver(null){
+                protected void onReceiveResult (int resultCode, Bundle resultData){
+                    update();
+                }
+            });
+
     }
 }
